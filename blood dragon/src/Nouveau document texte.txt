@@ -1,0 +1,296 @@
+package view;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import model.Escouade;
+
+import controller.ExceptionAddEscouade;
+
+public class AddEscouadeTactique extends JPanel {
+
+	// constantes
+	private final static String IMAGE = ".\\image\\ajoutEscouade.jpg";
+
+	// variables
+	private Image background;
+
+	private JComboBox comboNbMembre, comboArmeLourde, comboArmeSpeciale,
+			comboEscouade, comboSergent;
+	private JLabel labelEscouade, labelSergent, labelNbMembre,
+			labelArmeSpeciale, labelArmeLourde;
+
+	private JTextField textFNomSergent;
+
+	private JTextField textFNomEscouade;
+
+	private JTextField textFArmeEscouade;
+
+	private JTextField textFSergentMainGauche;
+	private JButton butEncoder;
+	private int i, nbMembre;
+	private Escouade escouade;
+	private String nomEscouade, typeEscouade, armePrincipale, equipementSupp,
+			fKOfficier, armeSupp1, armeSupp2, armeSupp3;
+	private String nomOfficier, typeOfficier, mainDroiteOfficier,
+			mainGaucheOfficier, equipementOfficier;
+
+	public AddEscouadeTactique() {
+		this.setBounds(0, 0, view.MainJFrame.getRectPanelPrincipal().width,
+				view.MainJFrame.getRectPanelPrincipal().height);
+		
+		butEncoder = new JButton("Next");
+		butEncoder.setBounds(900, 600, 100, 24);
+
+		labelEscouade = new JLabel("Nom de l'escouade: ");
+		labelEscouade.setBounds(10, 40, 150, 24);
+
+		textFNomEscouade = new JTextField();
+		textFNomEscouade.setBounds(160, 40, 200, 24);
+
+		comboEscouade = new JComboBox();
+		comboEscouade.addItem("Tactique");
+		comboEscouade.addItem("Assaut");
+		comboEscouade.addItem("Devastator");
+		comboEscouade.addItem("Veterant");
+		comboEscouade.addItem("Terminator");
+		comboEscouade.setBounds(10, 10, 100, 24);
+
+		labelNbMembre = new JLabel("Nombre de membres de l'escouade: ");
+		labelNbMembre.setBounds(10, 70, 300, 24);
+
+		comboNbMembre = new JComboBox();
+		for (i = 5; i <= 10; i++) {
+			comboNbMembre.addItem(i);
+		}
+		comboNbMembre.setBounds(225, 70, 40, 24);
+
+		textFArmeEscouade = new JTextField("Bolter");
+		textFArmeEscouade.setEditable(false);
+		textFArmeEscouade.setBounds(100, 350, 75, 24);
+
+		labelArmeLourde = new JLabel("Arme lourde:");
+		labelArmeLourde.setForeground(Color.cyan);
+		labelArmeLourde.setBounds(275, 375, 150, 24);
+
+		comboArmeLourde = new JComboBox();
+		comboArmeLourde.addItem("Aucune");
+		comboArmeLourde.addItem("Bolter lourd");
+		comboArmeLourde.addItem("Canon laser");
+		comboArmeLourde.addItem("Lance-missiles (frag)");
+		comboArmeLourde.addItem("Lance-plasma lourd");
+		comboArmeLourde.setBounds(275, 400, 150, 24);
+
+		labelArmeSpeciale = new JLabel("Arme spéciale:");
+		labelArmeSpeciale.setForeground(Color.cyan);
+		labelArmeSpeciale.setBounds(275, 325, 175, 24);
+
+		comboArmeSpeciale = new JComboBox();
+		comboArmeSpeciale.addItem("Aucune");
+		comboArmeSpeciale.addItem("Fuseur");
+		comboArmeSpeciale.addItem("Lance-flammes");
+		comboArmeSpeciale.addItem("Lance-plasma");
+		comboArmeSpeciale.setBounds(275, 350, 150, 24);
+
+		labelSergent = new JLabel("Nom du sergent: ");
+		labelSergent.setBounds(550, 40, 150, 24);
+
+		textFNomSergent = new JTextField();
+		textFNomSergent.setBounds(680, 40, 200, 24);
+
+		textFSergentMainGauche = new JTextField("Pistolet bolter");
+		textFSergentMainGauche.setEditable(false);
+		textFSergentMainGauche.setBounds(875, 350, 100, 24);
+
+		comboSergent = new JComboBox();
+		comboSergent.addItem("Arme de corps à corps");
+		comboSergent.addItem("Arme énergétique");
+		comboSergent.addItem("Gantelet énergétique");
+		comboSergent.setBounds(550, 350, 175, 24);
+
+		// image de fond
+		background = getToolkit().getImage(IMAGE);
+		this.setLayout(null);
+		this.add(comboEscouade);
+		this.add(labelEscouade);
+		this.add(textFNomEscouade);
+		this.add(labelSergent);
+		this.add(textFNomSergent);
+		this.add(comboSergent);
+		this.add(comboArmeLourde);
+		this.add(comboArmeSpeciale);
+		this.add(textFSergentMainGauche);
+		this.add(comboNbMembre);
+		this.add(labelNbMembre);
+		this.add(textFArmeEscouade);
+		this.add(labelArmeLourde);
+		this.add(labelArmeSpeciale);
+		this.add(butEncoder);
+
+		MyButtonListener list = new MyButtonListener();
+		butEncoder.addActionListener(list);
+		;
+
+		MonGestionnaire itemListener = new MonGestionnaire();
+		comboEscouade.addItemListener(itemListener);
+
+		this.setVisible(true);
+	}
+
+	public boolean ajouterEscouade() {
+
+		try {
+			model.Escouade escouade = new model.Escouade(nomEscouade,
+					typeEscouade, armePrincipale, armeSupp1,
+					armeSupp2, armeSupp3, equipementSupp,
+					fKOfficier, nomOfficier, typeOfficier,
+					mainDroiteOfficier, mainGaucheOfficier,
+					equipementOfficier, nbMembre);
+
+			escouade.setNomEscouade(textFNomEscouade.getText());
+
+			escouade.setTypeEscouade(String.valueOf(comboEscouade
+					.getItemAt(comboEscouade.getSelectedIndex())));
+
+			escouade.setArmePrincipale(textFArmeEscouade.getText());
+
+			escouade.setArmeSupp1(String.valueOf(comboArmeSpeciale
+					.getItemAt(comboArmeSpeciale.getSelectedIndex())));
+
+			escouade.setArmeSupp2(String.valueOf(comboArmeLourde
+					.getItemAt(comboArmeLourde.getSelectedIndex())));
+
+			escouade.setArmeSupp3("null");
+
+			escouade.setNbMembre(Integer.parseInt(String.valueOf(comboNbMembre
+					.getItemAt(comboNbMembre.getSelectedIndex()))));
+
+			escouade.setEquipementSupp("null");
+
+			escouade.setFKOfficier(textFNomSergent.getText());
+
+			escouade.setNomOfficier(textFNomSergent.getText());
+
+			escouade.setTypeOfficier("Sergent vétérant");
+
+			escouade.setMainGaucheOfficier(textFSergentMainGauche.getText());
+
+			escouade.setMainDroiteOfficier(String.valueOf(comboSergent
+					.getItemAt(comboSergent.getSelectedIndex())));
+
+			escouade.setEquipementOfficier("null");
+			
+System.out.println(escouade);
+
+			return true;
+			
+			return escouade;
+
+		} catch (ExceptionAddEscouade e) {
+
+			JOptionPane.showMessageDialog(null, e, "Erreur Type",
+					JOptionPane.ERROR_MESSAGE);
+
+			return false;
+			
+			return escouade;
+
+		}
+	}
+
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		g.drawImage(background, 0, 0, this);
+
+	}
+
+	private class MonGestionnaire implements ItemListener {
+		public void itemStateChanged(ItemEvent e) {
+
+			// on recupère l'objet
+
+			if (e.getSource() == comboEscouade) {
+				if (comboEscouade.getSelectedItem().equals("Assaut")) {
+					controller.GestionFenetre
+							.eraseContainerPanelPrincipalMainJFrame();
+					controller.GestionFenetre.ajoutEscouadeAssaut();
+				}
+			}
+			if (e.getSource() == comboEscouade) {
+				if (comboEscouade.getSelectedItem().equals("Devastator")) {
+					controller.GestionFenetre
+							.eraseContainerPanelPrincipalMainJFrame();
+					controller.GestionFenetre.ajoutEscouadeDevastator();
+				}
+			}
+			if (e.getSource() == comboEscouade) {
+				if (comboEscouade.getSelectedItem().equals("Veterant")) {
+					controller.GestionFenetre
+							.eraseContainerPanelPrincipalMainJFrame();
+					controller.GestionFenetre.ajoutEscouadeVeterant();
+				}
+			}
+			if (e.getSource() == comboEscouade) {
+				if (comboEscouade.getSelectedItem().equals("Terminator")) {
+					controller.GestionFenetre
+							.eraseContainerPanelPrincipalMainJFrame();
+					controller.GestionFenetre.ajoutEscouadeTerminator();
+				}
+			}
+
+		}
+	}
+
+	private class MyButtonListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			Object source = e.getSource();
+
+			if (source == butEncoder) {
+				if (ajouterEscouade() == true) {
+
+					try {
+System.out.println("1");
+						
+System.out.println("2");
+						switch (JOptionPane
+								.showConfirmDialog(
+										null,
+										escouade
+												+ "\n\nEtes-vous sur de vouloir procéder à la mise à jour?",
+										"RESUME",
+										JOptionPane.INFORMATION_MESSAGE)) {
+
+						case JOptionPane.YES_OPTION:
+							controller.GestionBD.addEscouade(escouade);
+
+							break;
+
+						case JOptionPane.NO_OPTION:
+							JOptionPane.showMessageDialog(null,
+									"Abandon de l'operation");
+							break;
+						}
+					} catch (Exception e1) {
+System.out.println("3");						
+						JOptionPane.showMessageDialog(null, e1, "Erreur Type",
+								JOptionPane.ERROR_MESSAGE);
+					}
+
+				}
+			}
+
+		}
+	}
+}
